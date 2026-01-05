@@ -13,7 +13,8 @@ type Transaction struct {
 	ID         uint            `gorm:"primaryKey"`
 	Type       TransactionType `gorm:"size:10;not null"`
 	Amount     float64         `gorm:"not null"`
-	Category   string          `gorm:"size:100;not null"`
+	CategoryID uint            `gorm:"not null;index"`
+	Category   Category        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Note       string          `gorm:"size:255"`
 	OccurredAt time.Time       `gorm:"not null;index"`
 	CreatedAt  time.Time
