@@ -37,7 +37,7 @@ func (s *FinanceService) AddExpense(
 	tx := models.Transaction{
 		Type:       models.Expense,
 		Amount:     amount,
-		Category:   category,
+		Category:   models.Category{},
 		Note:       note,
 		OccurredAt: normalizeDate(occurredAt),
 	}
@@ -53,7 +53,7 @@ func (s *FinanceService) AddIncome(
 	tx := models.Transaction{
 		Type:       models.Income,
 		Amount:     amount,
-		Category:   category,
+		Category:   models.Category{},
 		OccurredAt: normalizeDate(occurredAt),
 	}
 
