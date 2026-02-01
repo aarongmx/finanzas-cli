@@ -1,0 +1,217 @@
+erDiagram
+    USERS {
+        UUID id PK
+        VARCHAR email
+        TEXT password_hash
+        TIMESTAMP created_at
+    }
+
+    ACCOUNTS {
+        UUID id PK
+        UUID user_id FK
+        VARCHAR name
+        VARCHAR type
+        NUMERIC balance
+        BOOLEAN is_primary
+        TIMESTAMP created_at
+    }
+
+    CATEGORIES {
+        UUID id PK
+        UUID user_id FK
+        VARCHAR name
+        VARCHAR type
+        UUID parent_id FK
+        BOOLEAN is_recurring
+        TIMESTAMP created_at
+    }
+
+    INCOME {
+        UUID id PK
+        UUID user_id FK
+        UUID account_id FK
+        UUID category_id FK
+        NUMERIC amount
+        VARCHAR source
+        BOOLEAN is_recurring
+        VARCHAR recurrence_rule
+        TEXT description
+        DATE received_at
+    }
+
+    EXPENSES {
+        UUID id PK
+        UUID user_id FK
+        UUID account_id FK
+        UUID credit_card_id FK
+        UUID category_id FK
+        NUMERIC amount
+        TEXT description
+        DATE expense_date
+        BOOLEAN is_extraordinary
+    }
+
+    CREDIT_CARDS {
+        UUID id PK
+        UUID user_id FK
+        VARCHAR name
+        NUMERIC credit_limit
+        INT cut_day
+        INT payment_day
+        NUMERIC balance
+    }
+
+    CREDIT_CARD_STATEMENTS {
+        UUID id PK
+        UUID credit_card_id FK
+        DATE period_start
+        DATE period_end
+        DATE due_date
+        NUMERIC minimum_payment
+        NUMERIC total_balance
+        BOOLEAN paid
+    }
+
+    CREDIT_CARD_CHARGES {
+        UUID id PK
+        UUID statement_id FK
+        VARCHAR type
+        NUMERIC amount
+    }
+
+    CREDIT_CARD_PAYMENTS {
+        UUID id PK
+        UUID credit_card_id FK
+        UUID account_id FK
+        UUID statement_id FK
+        NUMERIC amount
+        DATE payment_date
+    }
+
+    CREDIT_CARD_INSTALLMENT_PLANS {
+        UUID id PK
+        UUID credit_card_id FK
+        UUID expense_id FK
+        NUMERIC total_amount
+        INT installments
+        NUMERIC installment_amount
+        NUMERIC interest_rate
+        NUMERIC interest_vat_rate
+        DATE start_date
+        DATE end_date
+    }
+
+    CREDIT_CARD_INSTALLMENTS {
+        UUID id PK
+        UUID installment_plan_id FK
+        UUID statement_id FK
+        INT installment_number
+        DATE due_date
+        NUMERIC principal_amount
+        NUMERIC interest_amount
+        NUMERIC interest_vat
+        BOOLEAN paid
+    }
+
+    SUBSCRIPTIONS {
+        UUID id PK
+        UUID user_id FK
+        UUID category_id FK
+        UUID credit_card_id FK
+        NUMERIC amount
+        VARCHAR frequency
+        DATE next_charge
+        BOOLEAN active
+    }
+
+    SAVINGS_GOALS {
+        UUID id PK
+        UUID user_id FK
+        VARCHAR name
+        NUMERIC target_amount
+        NUMERIC current_amount
+        DATE target_date
+        VARCHAR status
+        TEXT description
+        TIMESTAMP created_at
+    }
+
+    SAVINGS_CONTRIBUTIONS {
+        UUID id PK
+        UUID savings_goal_id FK
+        UUID account_id FK
+        NUMERIC amount
+        DATE contribution_date
+        BOOLEAN is_recurring
+    }
+
+    SAVINGS_RULES {
+        UUID id PK
+        UUID savings_goal_id FK
+        UUID source_account_id FK
+        VARCHAR frequency
+        NUMERIC amount
+        BOOLEAN active
+    }
+
+    BUDGETS {
+        UUID id PK
+        UUID user_id FK
+        VARCHAR name
+        DATE period_start
+        DATE period_end
+        TIMESTAMP created_at
+    }
+
+    BUDGET_ITEMS {
+        UUID id PK
+        UUID budget_id FK
+        UUID category_id FK
+        NUMERIC amount_limit
+    }
+
+    BUDGET_TRACKING {
+        UUID id PK
+        UUID budget_item_id FK
+        NUMERIC spent_amount
+        NUMERIC committed_amount
+        NUMERIC remaining_amount
+        VARCHAR status
+    }
+
+    USERS ||--o{ ACCOUNTS : owns
+    USERS ||--o{ CATEGORIES : defines
+    USERS ||--o{ INCOME : receives
+    USERS ||--o{ EXPENSES : incurs
+    USERS ||--o{ CREDIT_CARDS : has
+    USERS ||--o{ SUBSCRIPTIONS : manages
+    USERS ||--o{ SAVINGS_GOALS : plans
+    USERS ||--o{ BUDGETS : sets
+
+    CATEGORIES ||--o{ CATEGORIES : parent_of
+    CATEGORIES ||--o{ INCOME : classifies
+    CATEGORIES ||--o{ EXPENSES : classifies
+    CATEGORIES ||--o{ SUBSCRIPTIONS : classifies
+    CATEGORIES ||--o{ BUDGET_ITEMS : budgets
+
+    ACCOUNTS ||--o{ INCOME : sources
+    ACCOUNTS ||--o{ EXPENSES : pays
+    ACCOUNTS ||--o{ CREDIT_CARD_PAYMENTS : funds
+    ACCOUNTS ||--o{ SAVINGS_CONTRIBUTIONS : contributes
+    ACCOUNTS ||--o{ SAVINGS_RULES : savings_source
+
+    CREDIT_CARDS ||--o{ EXPENSES : charged_to
+    CREDIT_CARDS ||--o{ CREDIT_CARD_STATEMENTS : generates
+    CREDIT_CARDS ||--o{ CREDIT_CARD_PAYMENTS : receives
+    CREDIT_CARDS ||--o{ CREDIT_CARD_INSTALLMENT_PLANS : finances
+
+    CREDIT_CARD_STATEMENTS ||--o{ CREDIT_CARD_CHARGES : breaks_into
+    CREDIT_CARD_STATEMENTS ||--o{ CREDIT_CARD_INSTALLMENTS : includes
+
+    CREDIT_CARD_INSTALLMENT_PLANS ||--o{ CREDIT_CARD_INSTALLMENTS : splits_into
+
+    SAVINGS_GOALS ||--o{ SAVINGS_CONTRIBUTIONS : receives
+    SAVINGS_GOALS ||--o{ SAVINGS_RULES : automated_by
+
+    BUDGETS ||--o{ BUDGET_ITEMS : contains
+    BUDGET_ITEMS ||--|| BUDGET_TRACKING : tracks
